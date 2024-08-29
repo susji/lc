@@ -9,7 +9,7 @@ default: lc
 
 .PHONY: clean
 clean:
-	rm -f lc0 lc1 lc *.s *.o out out.s out.s.* toks.c.inc tests/*.o tests/*.test
+	rm -f lc0 lc1 lc *.s *.o toks.c.inc tests/*.o tests/*.test
 
 .PHONY: regentokens
 regentokens:
@@ -33,19 +33,21 @@ tests/%.test: tests/%.lc lc0
 lc0: lc.c
 	$(CC) -g -O0 -std=c89 -o $@ $^ $(CFLAGS)
 
-lc1: lc0
-	rm -f out.s
+lc1.s: lc0
 	cat lc.c | ./lc0
-	mv -v out.s out.s.lc0
-	as -g -s --32 -o "$@.o" out.s.lc0 \
+	mv out.s lc1.s
+
+lc1: lc1.s
+	as -g -s --32 -o "$@.o" "$<" \
 		&& ld -m elf_i386 -o "$@" -dynamic-linker /lib/ld-linux.so.2 \
 			/usr/lib32/crt1.o /usr/lib32/crti.o "$@.o" -lc /usr/lib32/crtn.o
 
-lc: lc1
-	rm -f out.s
+lc.s: lc1
 	cat lc.c | ./lc1
-	mv -v out.s out.s.lc1
-	as -g -s --32 -o "$@.o" out.s.lc1 \
+	mv out.s lc.s
+
+lc: lc.s
+	as -g -s --32 -o "$@.o" "$<" \
 		&& ld -m elf_i386 -o "$@" -dynamic-linker /lib/ld-linux.so.2 \
 			/usr/lib32/crt1.o /usr/lib32/crti.o "$@.o" -lc /usr/lib32/crtn.o
-	diff out.s.lc0 out.s.lc1
+	diff -ruN lc1.s lc.s
