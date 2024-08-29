@@ -7,7 +7,7 @@ lc: lc.c
 
 .PHONY: clean
 clean:
-	rm -f lc lc1 lc2 *.s *.o out toks.c.inc tests/*.o tests/*.test
+	rm -f lc lc1 lc2 *.s *.o out out.s out.s.* toks.c.inc tests/*.o tests/*.test
 
 .PHONY: regentokens
 regentokens:
@@ -41,3 +41,4 @@ lc2: lc1 lc lc.c
 		&& ld -m elf_i386 -o "$@" -dynamic-linker /lib/ld-linux.so.2 \
 			/usr/lib32/crt1.o /usr/lib32/crti.o "$@.o" -lc /usr/lib32/crtn.o
 	mv -v out.s out.s.lc1
+	diff out.s.lc out.s.lc1
