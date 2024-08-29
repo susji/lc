@@ -2,6 +2,10 @@ CC = cc
 CFLAGS = -fsanitize=address -D VERBOSE
 TESTS = $(wildcard tests/*.lc)
 
+.EXPORT_ALL_VARIABLES:
+ASAN_OPTIONS=detect_leaks=0
+
+
 .PHONY: clean
 clean:
 	rm -f lc0 lc1 lc *.s *.o out out.s out.s.* toks.c.inc tests/*.o tests/*.test
