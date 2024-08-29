@@ -23,5 +23,6 @@ jobs:
         run: make lc
       - name: compare results
         run: |
-          sha256sum lc1.s lc
+          sha256sum lc1.s lc.s
           diff lc1.s lc.s
+          cmp lc1.s lc.s
