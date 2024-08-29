@@ -8,8 +8,6 @@ on:
 
 jobs:
   test:
-    env:
-      ASAN_OPTIONS: detect_leaks=0
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -25,5 +23,5 @@ jobs:
         run: make lc
       - name: compare results
         run: |
-          diff out.s.lc0 out.s.lc1
-          sha256sum out.s.*
+          sha256sum lc1.s lc
+          diff lc1.s lc.s
