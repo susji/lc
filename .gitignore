@@ -1,7 +1,6 @@
-lc
+lc0
 lc1
-lc2
-*.dSYM
+lc
 .python-version
 toks.c.inc
 a.out
