@@ -1,0 +1,27 @@
+void puts(const char *);
+
+int main(void) {
+  int a;
+  int b;
+
+  a = 1;
+  b = 2;
+  if (a < b) {
+    puts("1: things make sense");
+  } else {
+    puts("1: oh no");
+  }
+  a = 3;
+  if (a < b) {
+    puts("2: oh no");
+  } else {
+    puts("2: things make sense");
+  }
+}
+
+/*
+ * OUTSTART
+1: things make sense
+2: things make sense
+ * OUTEND
+ */

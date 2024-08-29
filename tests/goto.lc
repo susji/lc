@@ -1,0 +1,19 @@
+void puts(const char *);
+
+int main(void) {
+    puts("hello world");
+    goto labelone;
+    puts("hola mundo");
+labelone:
+    puts("hello again");
+    goto labeltwo;
+    puts("this should not be seen either");
+labeltwo:
+}
+
+/*
+ * OUTSTART
+hello world
+hello again
+ * OUTEND
+ */

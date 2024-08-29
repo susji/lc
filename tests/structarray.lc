@@ -1,0 +1,29 @@
+int printf(const char *, ...);
+void *calloc(long long, long long);
+
+struct s {
+       int a[16];
+       char b[8];
+};
+
+int main(void) {
+    struct s o;
+    struct s *op;
+
+    op = calloc(1, sizeof(struct s));
+
+    o.a[5] = 123;
+    op->a[5] = 321;
+    o.b[7] = 78;
+    op->b[7] = 87;
+
+    printf("%d %d\n", o.a[5], op->a[5]);
+    printf("%d %d\n", o.b[7], op->b[7]);
+}
+
+/*
+ * OUTSTART
+123 321
+78 87
+ * OUTEND
+ */

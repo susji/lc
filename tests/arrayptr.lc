@@ -1,0 +1,31 @@
+int printf(const char *, ...);
+void *calloc(unsigned long, unsigned long);
+
+int give(int i) {
+    return '0'+i;
+}
+
+int main(void) {
+    char *arr;
+    int i;
+
+    arr = calloc(1, 78);
+    i = 0;
+    while (i < 78) {
+        arr[i] = give(i);
+        ++i;
+    }
+
+    i = 0;
+    while (i < 78) {
+        printf("%c", arr[i]);
+        ++i;
+    }
+    printf("\n");
+}
+
+/*
+ * OUTSTART
+0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}
+ * OUTEND
+ */

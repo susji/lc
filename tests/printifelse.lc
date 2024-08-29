@@ -1,0 +1,29 @@
+int printf(const char *, ...);
+int puts(const char *);
+
+struct s {
+       char *a;
+};
+
+int main(void) {
+  struct s s;
+
+  s.a = 0;
+  while (1) {
+    printf("hello ");
+    if (s.a) {
+      printf("wrong!\n");
+    } else {
+      puts("world!");
+      break;
+    }
+    puts("even wronger!");
+    puts(0);
+  }
+}
+
+/*
+ * OUTSTART
+hello world!
+ * OUTEND
+ */

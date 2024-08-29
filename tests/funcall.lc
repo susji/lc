@@ -1,0 +1,19 @@
+int printf(const char *fmt, ...);
+
+int calc(int a, int b) {
+  return a - b;
+}
+
+int main(void) {
+  int a = 5;
+  int b = 7;
+  int c;
+  c = calc(a, b);
+  printf("%d %c %d is %d\n", a, '-', b, c);
+}
+
+/*
+ * OUTSTART
+5 - 7 is -2
+ * OUTEND
+ */

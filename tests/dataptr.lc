@@ -1,0 +1,30 @@
+int printf(const char *, ...);
+
+static char ARR[123] = { 1, 2, 3, 4, 5 };
+static char *CUR = ARR;
+
+int get(void) {
+    int ret;
+
+    ret = *CUR;
+    ++CUR;
+    return ret;
+}
+
+int main(void) {
+    int c;
+
+    while ((c = get())) {
+          printf("%d\n", c);
+    }
+}
+
+/*
+ * OUTSTART
+1
+2
+3
+4
+5
+ * OUTEND
+ */

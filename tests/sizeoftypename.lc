@@ -1,0 +1,18 @@
+int printf(const char *fmt, ...);
+
+struct s {
+       int a;
+       int b;
+       int c;
+};
+
+int main(void) {
+    printf("%d %d %d %d %d\n",
+               sizeof(int), sizeof(char), sizeof(char *), sizeof(struct s), sizeof(char[123]);
+}
+
+/*
+ * OUTSTART
+4 1 4 12 123
+ * OUTEND
+ */

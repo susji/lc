@@ -1,0 +1,56 @@
+void puts(const char *);
+
+int main(void) {
+  if (1 > 10) {
+    puts("1: oh no");
+  } else if (2 > 10) {
+    puts("1: oh no x2");
+  } else if (10 == 10) {
+    puts("1: things make sense");
+  } else {
+    puts("1: oh no x3");
+  }
+
+  if (1 == 2) {
+    puts("2: oh no");
+  } else {
+    puts("2: things make sense");
+  }
+
+  if (1 > 1) {
+    puts("3: oh no");
+  }
+
+  if (0) {
+    puts("4: oh no");
+  } else if (0) {
+    puts("4: oh no x2");
+  } else {
+    puts("4: things make sense");
+  }
+
+  if (1) {
+    if (1 == 2) {
+      puts("5: oh no");
+    } else if (0) {
+      puts("5: oh no x2");
+    } else if (0) {
+      puts("5: oh no x3");
+    } else if (0) {
+      puts("5: oh no x4");
+    } else if (123 == 123) {
+      puts("5: things make sense");
+    }
+  } else {
+    puts("5: oh no x");
+  }
+}
+
+/*
+ * OUTSTART
+1: things make sense
+2: things make sense
+4: things make sense
+5: things make sense
+ * OUTEND
+ */

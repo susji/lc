@@ -1,0 +1,25 @@
+int printf(const char *, ...);
+void *calloc(long long, long long);
+
+struct outer {
+    void *i;
+};
+
+struct inner {
+    int a;
+};
+
+int main(void) {
+    struct outer so;
+    struct inner *si;
+    si = calloc(1, sizeof(struct inner));
+    si->a = 123;
+    so.i = si;
+    printf("%d\n", ((struct inner *)so.i)->a);
+}
+
+/*
+ * OUTSTART
+123
+ * OUTEND
+ */

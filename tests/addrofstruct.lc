@@ -1,0 +1,26 @@
+int printf(const char *, ...);
+
+struct s {
+       int i;
+       char *s;
+};
+
+int main(void) {
+    int *ip;
+    char **sp;
+    struct s a;
+
+    ip = &a.i;
+    sp = &a.s;
+
+    *ip = 123;
+    *sp = "Hello World!";
+
+    printf("%d %s\n", a.i, a.s);
+}
+
+/*
+ * OUTSTART
+123 Hello World!
+ * OUTEND
+ */

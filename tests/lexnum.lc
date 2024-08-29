@@ -1,0 +1,82 @@
+int printf(const char *, ...);
+void *calloc(unsigned long, unsigned long);
+long strtol(const char *, char **, int);
+unsigned long strlen(const char *);
+int puts(const char *);
+char *strcpy(char *, const char *);
+int isdigit(int);
+void free(void *);
+
+static char CODE[1000000];
+static char *CURCODE = CODE;
+
+int lexpeek(void) {
+  return *CURCODE;
+}
+
+void lexnext(void) {
+  ++CURCODE;
+}
+
+void lexerr(char *e) {
+  printf("error: %s\n", e);
+}
+
+int CONSTANT = 123;
+
+void lexemiti(int kind, int value) {
+    printf("result is %d\n", value);
+}
+
+int lexnum(void) {
+  long long res;
+  char *raw;
+  int i;
+
+  raw = calloc(22, 1);
+  i = 0;
+  while (isdigit(lexpeek())) {
+    if (i == 21) {
+      lexerr("number too long");
+      return 1;
+    }
+    raw[i] = lexpeek();
+    lexnext();
+    ++i;
+  }
+  res = strtol(raw, 0, 10);
+  if (res == 0 && strlen(raw) != 1 && raw[0] != '0') {
+    lexerr("bad number");
+    free(raw);
+    return 1;
+  }
+  lexemiti(CONSTANT, res);
+  free(raw);
+  return 0;
+}
+
+int main(void) {
+    strcpy(CODE, "123456789");
+    lexnum();
+
+    strcpy(CODE, "10101010");
+    CURCODE = CODE;
+    lexnum();
+
+    strcpy(CODE, "abc1");
+    CURCODE = CODE;
+    lexnum();
+
+    strcpy(CODE, "1");
+    CURCODE = CODE;
+    lexnum();
+}
+
+/*
+ * OUTSTART
+result is 123456789
+result is 10101010
+error: bad number
+result is 1
+ * OUTEND
+ */

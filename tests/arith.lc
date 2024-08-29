@@ -1,0 +1,14 @@
+int printf(const char *, ...);
+
+int main(int argc, char *argv[]) {
+  int res;
+  int a = 11;
+  int b = 5;
+  res = a / 2 + 7 * b;
+  printf("result is %d\n", res);
+}
+  /*
+   * OUTSTART
+result is 40
+   * OUTEND
+   */

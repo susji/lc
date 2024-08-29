@@ -1,0 +1,25 @@
+int printf(const char *, ...);
+
+int values[3];
+int *curvalue = values;
+
+int main(void) {
+    values[0] = 0;
+    values[1] = 1;
+    values[2] = 2;
+
+    printf("%d\n", *curvalue);
+    ++curvalue;
+    printf("%d\n", *curvalue);
+    ++curvalue;
+    printf("%d\n", *curvalue);
+    ++curvalue;
+}
+
+/*
+ * OUTSTART
+0
+1
+2
+ * OUTEND
+ */

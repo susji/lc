@@ -1,0 +1,11 @@
+int printf(const char *, ...);
+
+int main(void) {
+    printf("%d\n", ~37);
+}
+
+/*
+ * OUTSTART
+-38
+ * OUTEND
+ */

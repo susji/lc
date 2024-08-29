@@ -1,0 +1,65 @@
+int printf(const char *, ...);
+
+int i = 1;
+
+int get(void) {
+    int ret;
+
+    if (i == 10) {
+       return 0;
+    }
+
+    ret = i;
+    ++i;
+    return ret;
+}
+
+void reset(void) {
+     i = 1;
+}
+
+int main(void) {
+    int v;
+
+    printf("i=%d\n", i);
+
+    while (1) {
+          v = get();
+          if (!v) {
+             break;
+          }
+          printf("%d\n", v);
+    }
+
+    reset();
+    printf("i=%d\n", i);
+
+    while ((v = get())) {
+          printf("%d\n", v);
+    }
+}
+
+/*
+ * OUTSTART
+i=1
+1
+2
+3
+4
+5
+6
+7
+8
+9
+i=1
+1
+2
+3
+4
+5
+6
+7
+8
+9
+ * OUTEND
+ */

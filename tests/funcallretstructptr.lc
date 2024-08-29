@@ -1,0 +1,30 @@
+void *calloc(long long, long long);
+int printf(const char *, ...);
+
+struct s {
+       int a;
+       int b;
+};
+
+struct s *new(int x, int y) {
+       struct s *ret;
+       ret = calloc(1, sizeof(struct s));
+       ret->a = x;
+       ret->b = y;
+       return ret;
+}
+
+int main(void) {
+    struct s *v;
+
+    v = new(123, 456);
+    printf("%d %d\n", v->a, v->b);
+    printf("%d\n", new(678, 951)->a);
+}
+
+/*
+ * OUTSTART
+123 456
+678
+ * OUTEND
+ */

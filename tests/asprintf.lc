@@ -1,0 +1,31 @@
+void *calloc(unsigned long, unsigned long);
+int asprintf(char **, const char *, ...);
+int puts(const char *s);
+
+struct inner {
+       int x;
+       int y;
+};
+
+struct outer {
+       int a;
+       struct inner *i;
+       int b;
+};
+
+int main(void) {
+    struct outer *s;
+    char *e;
+
+    s = calloc(1, sizeof(struct outer));
+    s->i = calloc(1, sizeof(struct inner));
+    s->i->y = 123;
+    asprintf(&e, "hello %d", s->i->y);
+    puts(e);
+}
+
+/*
+ * OUTSTART
+hello 123
+ * OUTEND
+ */

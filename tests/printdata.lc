@@ -1,0 +1,13 @@
+int puts(const char *);
+
+char *ptr = "Hello via char pointer!";
+
+int main(void) {
+  puts(ptr);
+}
+
+/*
+ * OUTSTART
+Hello via char pointer!
+ * OUTEND
+ */

@@ -1,0 +1,17 @@
+int printf(const char *, ...);
+
+struct s {
+       int a[16];
+       char b[8];
+};
+
+int main(void) {
+    struct s o;
+    printf("%d %d %d %d\n", sizeof(o), sizeof(struct s), sizeof(o.a), sizeof(o.b));
+}
+
+/*
+ * OUTSTART
+72 72 64 8
+ * OUTEND
+ */

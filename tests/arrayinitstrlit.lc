@@ -1,0 +1,22 @@
+int puts(const char *);
+
+char *arr[] = {
+     "first",
+     "second",
+     0,
+     "third",
+};
+
+int main(void) {
+    puts(arr[0]);
+    puts(arr[1]);
+    puts(arr[3]);
+}
+
+/*
+ * OUTSTART
+first
+second
+third
+ * OUTEND
+ */

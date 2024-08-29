@@ -1,0 +1,18 @@
+int printf(const char *, ...);
+
+int arr[8];
+
+int main(void) {
+    arr[0] = 123;
+    arr[2] = 321;
+    arr[4] = 456;
+    arr[6] = 654;
+
+    printf("%d %d %d %d\n", arr[0], arr[2], arr[4], arr[6]);
+}
+
+/*
+ * OUTSTART
+123 321 456 654
+ * OUTEND
+ */

@@ -1,0 +1,23 @@
+int printf(const char *, ...);
+
+int main(void) {
+    int a;
+    int b;
+    int c;
+
+    a = 123;
+    b = 234;
+    c = 345;
+
+    a |= b + 9;
+    b += 999;
+    c -= -321 ^ 123;
+
+    printf("%d %d %d\n", a, b, c);
+}
+
+/*
+ * OUTSTART
+251 1233 661
+ * OUTEND
+ */

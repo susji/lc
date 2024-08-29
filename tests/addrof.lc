@@ -1,0 +1,20 @@
+int printf(const char *, ...);
+
+int main(void) {
+    int *ptr;
+    int a;
+    int b;
+
+    ptr = &a;
+    *ptr = 123;
+    ptr = &b;
+    *ptr = 456;
+
+    printf("%d %d\n", a, b);
+}
+
+/*
+ * OUTSTART
+123 456
+ * OUTEND
+ */

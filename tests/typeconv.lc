@@ -1,0 +1,67 @@
+int printf(const char *, ...);
+int puts(const char *);
+void *memset(void *, int, unsigned long);
+
+char intchar(int v) {
+     printf("intchar: %d %c\n", v, v);
+     if (v != 33) {
+        puts("intchar: beep!");
+     }
+     return v;
+}
+
+int charint(char v) {
+    char pad[3]; /* we don't need this but other compilers may */
+    char vv;
+
+    memset(&vv, 255, 4);
+    vv = v;
+    printf("charint: %d %c\n", vv, vv);
+     if (vv != 33) {
+        puts("charint: beep!");
+     }
+    return vv;
+}
+
+/*
+ * The purpose of this test is to ensure that when converting between
+ * byte and integer-sized values, we actually ignore the bytes we are
+ * not meant to use. We achieve this by priming the stack to ensure we
+ * have garbage bytes to break the prints and compares unless only the
+ * correct bytes are used.
+ */
+int main(void) {
+    char c;
+    int i;
+
+    /*
+     * Of course we cannot generally rely on this overwriting `c`
+     * and `i` but in this specific case we know this exactly.
+     */
+    memset(&i, 255, 8);
+
+    c = '!';
+    c = intchar(c);
+    printf("-> %d\n", c);
+    c = intchar(33);
+    printf("-> %d\n", c);
+
+    i = '!';
+    i = charint(i);
+    printf("-> %d\n", i);
+    i = charint('!');
+    printf("-> %d\n", i);
+}
+
+/*
+ * OUTSTART
+intchar: 33 !
+-> 33
+intchar: 33 !
+-> 33
+charint: 33 !
+-> 33
+charint: 33 !
+-> 33
+ * OUTEND
+ */

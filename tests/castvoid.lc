@@ -1,0 +1,25 @@
+void *calloc(unsigned long, unsigned long);
+int printf(const char *, ...);
+
+struct s {
+       int a;
+       void *b;
+};
+
+int main(void) {
+    struct s *s;
+    int b;
+
+    s = calloc(1, sizeof(*s));
+    s->a = 123;
+    s->b = calloc(1, sizeof(int));
+    *(int *)s->b = 456;
+    b = *(int *)s->b;
+    printf("%d %d %d\n", s->a, *(int *)s->b, b);
+}
+
+/*
+ * OUTSTART
+123 456 456
+ * OUTEND
+ */

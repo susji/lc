@@ -1,0 +1,26 @@
+int printf(const char *, ...);
+
+enum Jep {
+  NII,
+  JOO,
+  JUU,
+  HEH = 123,
+  HAH,
+};
+
+int main(void) {
+    int a = NII;
+    int b = JOO;
+    int c = JUU;
+    int d = HEH;
+    int e = HAH;
+    printf("%d %d %d %d %d\n", NII, JOO, JUU, HEH, HAH);
+    printf("%d %d %d %d %d\n", a, b, c, d, e);
+}
+
+/*
+ * OUTSTART
+0 1 2 123 124
+0 1 2 123 124
+ * OUTEND
+ */

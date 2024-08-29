@@ -1,0 +1,15 @@
+int printf(const char *, ...);
+
+void hello(int a) {
+     printf("your number is %d\n", a);
+}
+
+int main(void) {
+    hello(10-5);
+}
+
+/*
+ * OUTSTART
+your number is 5
+ * OUTEND
+ */

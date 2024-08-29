@@ -1,0 +1,14 @@
+int printf(const char *, ...);
+void puts(const char *);
+
+int arr[8] = { 111, 222, 333, 444, 555, 666, 777 };
+
+int main(void) {
+    printf("%d %d %d %d %d\n", arr[0], arr[2], arr[4], arr[6], arr[7]);
+}
+
+/*
+ * OUTSTART
+111 333 555 777 0
+ * OUTEND
+ */

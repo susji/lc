@@ -1,0 +1,23 @@
+int printf(const char *, ...);
+void puts(const char *);
+
+int main(void) {
+  int a;
+  a = 0;
+  while (1) {
+    a = a + 1;
+    if (a < 10) {
+      continue;
+    }
+    printf("%d\n", a);
+    break;
+  }
+  puts("bye");
+}
+
+/*
+ * OUTSTART
+10
+bye
+ * OUTEND
+ */

@@ -1,0 +1,19 @@
+int printf(const char *fmt, ...);
+
+struct test {
+  int a;
+  char *b;
+};
+
+int main(void) {
+  struct test t;
+  t.a = 123;
+  t.b = "Hello Struct World!";
+  printf("%d %s\n", t.a, t.b);
+}
+
+/*
+ * OUTSTART
+123 Hello Struct World!
+ * OUTEND
+ */

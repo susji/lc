@@ -1,0 +1,37 @@
+int printf(const char *, ...);
+
+int fibo(int n) {
+    int a;
+    int b;
+    int res;
+
+    if (n <= 1) {
+       return n;
+    }
+    a = fibo(n-1);
+    b = fibo(n-2);
+    res = a+b;
+    printf("fibo(%d) = %d\n", n, res);
+    return res;
+}
+
+int main(void) {
+    fibo(6);
+}
+
+/*
+ * OUTSTART
+fibo(2) = 1
+fibo(3) = 2
+fibo(2) = 1
+fibo(4) = 3
+fibo(2) = 1
+fibo(3) = 2
+fibo(5) = 5
+fibo(2) = 1
+fibo(3) = 2
+fibo(2) = 1
+fibo(4) = 3
+fibo(6) = 8
+ * OUTEND
+ */

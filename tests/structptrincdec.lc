@@ -1,0 +1,22 @@
+void *calloc(unsigned long, unsigned long);
+int printf(const char *, ...);
+
+struct s {
+    int a;
+    int b;
+};
+
+int main(void) {
+    struct s *s;
+
+    s = calloc(1, sizeof(*s));
+    --s->a;
+    ++s->b;
+    printf("%d %d\n", s->a, s->b);
+}
+
+/*
+ * OUTSTART
+-1 1
+ * OUTEND
+ */

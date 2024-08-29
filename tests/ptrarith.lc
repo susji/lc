@@ -1,0 +1,22 @@
+int printf(const char *, ...);
+
+int main(void) {
+    int a[3] = {1, 2, 3};
+    int *b;
+
+    b = a;
+    printf("%d\n", *b);
+    ++b;
+    printf("%d\n", *b);
+    ++b;
+    printf("%d\n", *b);
+    ++b;
+}
+
+/*
+ * OUTSTART
+1
+2
+3
+ * OUTEND
+ */

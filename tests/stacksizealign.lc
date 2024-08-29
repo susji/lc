@@ -1,0 +1,44 @@
+int printf(const char *, ...);
+int memcpy(void *, void *, long unsigned);
+
+int main(void) {
+    /*
+     * The point of this test is to ensure that our stack is spaced
+     * and aligned properly. Everything should be aligned at least on
+     * four bytes and the layout should look something like the
+     * drawing below when considering memory layout as blocks of four
+     * bytes. `ebp` means our function's base pointer, and it points
+     * at the word where we have stored caller's base pointer.
+     * 
+     *
+     *   <-- stack grows                        addresses grow -->
+     *
+     * ebp-24    ebp-20    ebp-16    ebp-12    ebp-8     ebp-4     ebp       ebp+4
+     *   .---------+---------+---------+---------+---------+---------+---------+
+     *   | 1 2 3 4 | 1 2 3 4 | 1 2 3 4 | 1 2 3 4 | 1 2 3 4 | 1 2 3 4 | 1 2 3 4 |
+     *   +---------+---------+---------+---------+---------+---------+---------+
+     *   | 1 - - - | 0 1 2 3 | 4 5 - - | 0 1 2 3 | 4 5 - - | 1 - - - | 1 2 3 4 |
+     *   '---------+---------+---------+---------+---------+---------+---------+
+     *     d               c[6]                b[6]          a           ebp'
+     *
+     * Note: this isn't meant to convey anything about endianness.
+     */
+    char a;
+    char b[6];
+    char c[6];
+    char d;
+
+    memcpy(b, "12345", 5);
+    memcpy(c, "67890", 5);
+    b[5] = 0;
+    c[5] = 0;
+    a = '(';
+    d = ')';
+    printf("%c%s%s%c\n", a, b, c, d);
+}
+
+/*
+ * OUTSTART
+(1234567890)
+ * OUTEND
+ */

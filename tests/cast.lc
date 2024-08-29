@@ -1,0 +1,12 @@
+int printf(const char *, ...);
+
+int main(void) {
+    int a = 1;
+    printf("%d\n", (int)a);
+}
+
+/*
+ * OUTSTART
+1
+ * OUTEND
+ */

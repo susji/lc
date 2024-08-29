@@ -1,0 +1,13 @@
+lc
+lc1
+lc2
+*.dSYM
+.python-version
+toks.c.inc
+a.out
+*.s
+*.o
+out
+.gdb_history
+tests/*.test
+tests/*.o

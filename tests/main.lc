@@ -1,0 +1,16 @@
+extern int puts(const char *msg);
+
+char *msg = "Hello World!";
+
+int main(int argc, void *argv[]) {
+  char *msg2 = "Hola Mundo!";
+  puts(msg);
+  puts(msg2);
+}
+
+/*
+ * OUTSTART
+Hello World!
+Hola Mundo!
+ * OUTEND
+ */

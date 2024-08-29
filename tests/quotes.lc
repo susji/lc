@@ -1,0 +1,11 @@
+int printf(const char *, ...);
+
+int main(void) {
+    printf("%s %c\n", "\"", '\'');
+}
+
+/*
+ * OUTSTART
+" '
+ * OUTEND
+ */

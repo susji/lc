@@ -1,0 +1,24 @@
+int printf(const char *, ...);
+
+int main(void) {
+    char arr[8];
+    char *p;
+
+    arr[0] = 'h';
+    arr[1] = 'e';
+    arr[2] = 'l';
+    arr[3] = 'l';
+    arr[4] = 'o';
+    arr[5] = 0;
+    p = arr+4;
+    *p = 0;
+    p = arr;
+    *p = 'H';
+    printf("%s\n", p);
+}
+
+/*
+ * OUTSTART
+Hell
+ * OUTEND
+ */

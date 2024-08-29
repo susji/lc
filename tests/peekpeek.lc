@@ -1,0 +1,45 @@
+int printf(const char *, ...);
+
+struct tok {
+  int kind;
+  long i;
+  char c;
+  char *s;
+  int lineno;
+  int col;
+};
+
+static struct tok TOKS[100000];
+static struct tok *CURTOK = TOKS;
+
+int parsepeek(void) {
+  return CURTOK->kind;
+}
+
+int parsepeekpeek(void) {
+  struct tok *tok;
+
+  tok = CURTOK + 1;
+  /* probably fails and prints 24 because didn't implement this */
+  /*printf("delta %d\n", tok-CURTOK);*/
+  if (tok) {
+    return tok->kind;
+  } else {
+    return -1;
+  }
+}
+
+int main(void) {
+    TOKS[0].kind = 123;
+    TOKS[1].kind = 234;
+
+    printf("sizeofs %d %d\n", sizeof(TOKS), sizeof(struct tok));
+    printf("peeks %d %d\n", parsepeek(), parsepeekpeek());
+}
+
+/*
+ * OUTSTART
+sizeofs 2400000 24
+peeks 123 234
+ * OUTEND
+ */

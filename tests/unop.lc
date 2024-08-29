@@ -1,0 +1,35 @@
+int printf(const char *, ...);
+
+int main(void) {
+    int a;
+    int *b;
+    int c;
+
+    printf("%d %d %d\n", -1, +1, 1);
+
+    a = 10;
+    b = &a;
+    printf("%d %d\n", a, *b);
+
+    c = a;
+    printf("%d %d\n", a, ++c);
+    ++a;
+    printf("%d %d\n", a, --c);
+    printf("%d %d\n", a, c);
+
+    a = 10;
+    b = !a;
+    c = !!a;
+    printf("%d %d %d\n", !a, b, c);
+}
+
+/*
+ * OUTSTART
+-1 1 1
+10 10
+10 11
+11 10
+11 10
+0 0 1
+ * OUTEND
+ */

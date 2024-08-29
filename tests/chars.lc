@@ -1,0 +1,23 @@
+int printf(const char *, ...);
+
+int main(void) {
+    char a;
+    char b;
+    char c;
+
+    a = 'a';
+    b = 'b';
+    c = 'c';
+
+    printf("%c %c %c\n", a, b, c);
+    printf("%c %c %c\n", b, c, a);
+    printf("%c %c %c\n", c, a, b);
+}
+
+/*
+ * OUTSTART
+a b c
+b c a
+c a b
+ * OUTEND
+ */

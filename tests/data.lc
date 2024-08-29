@@ -1,0 +1,14 @@
+int printf(const char *, ...);
+
+char *h = "Hello World";
+int i = 123;
+
+int main(void) {
+    printf("%s %d\n", h, i);
+}
+
+/*
+ * OUTSTART
+Hello World 123
+ * OUTEND
+ */

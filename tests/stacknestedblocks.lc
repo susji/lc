@@ -1,0 +1,56 @@
+int printf(const char *, ...);
+
+int mul(int a, int b) {
+    int res;
+
+    res = a*b;
+    return res;
+}
+
+int doit(int maxi, int maxj) {
+    int i;
+    int j;
+    int n;
+
+    i = 1;
+    n = 0;
+    while (i < maxi) {
+          int nthis;
+          int x;
+
+          nthis = 0;
+          x = 0;
+          j = 1;
+          while (j < maxj) {
+                x += mul(i, j);
+                nthis += x;
+                printf("i=%d j=%d x=%d nthis=%d n=%d\n", i, j, x, nthis, n);
+                ++j;
+          }
+          ++i;
+          n += nthis;
+    }
+    return n;
+}
+
+int main(int argc, char *argv[]) {
+    int niter;
+
+    niter = doit(4, 4);
+    printf("niter=%d\n", niter);
+}
+
+/*
+ * OUTSTART
+i=1 j=1 x=1 nthis=1 n=0
+i=1 j=2 x=3 nthis=4 n=0
+i=1 j=3 x=6 nthis=10 n=0
+i=2 j=1 x=2 nthis=2 n=10
+i=2 j=2 x=6 nthis=8 n=10
+i=2 j=3 x=12 nthis=20 n=10
+i=3 j=1 x=3 nthis=3 n=30
+i=3 j=2 x=9 nthis=12 n=30
+i=3 j=3 x=18 nthis=30 n=30
+niter=60
+ * OUTEND
+ */

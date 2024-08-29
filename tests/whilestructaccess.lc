@@ -1,0 +1,42 @@
+int printf(const char *, ...);
+void *calloc(unsigned long, unsigned long);
+
+struct s {
+       int a;
+       char b;
+};
+
+struct s *arr[10];
+
+int main(void) {
+    int i;
+
+    i = 0;
+    while (i < 10) {
+          arr[i] = calloc(1, sizeof(struct s));
+          arr[i]->a = i;
+          arr[i]->b = '0' + i;
+          ++i;
+    }
+
+    i = 0;
+    while (i < 10) {
+          printf("[%d] <- a=%d b=%c\n", i, arr[i]->a, arr[i]->b);
+          ++i;
+    }
+}
+
+/*
+ * OUTSTART
+[0] <- a=0 b=0
+[1] <- a=1 b=1
+[2] <- a=2 b=2
+[3] <- a=3 b=3
+[4] <- a=4 b=4
+[5] <- a=5 b=5
+[6] <- a=6 b=6
+[7] <- a=7 b=7
+[8] <- a=8 b=8
+[9] <- a=9 b=9
+ * OUTEND
+ */

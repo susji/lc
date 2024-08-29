@@ -1,0 +1,28 @@
+int printf(const char *, ...);
+
+int iskeywordoridstart(char c) {
+  return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_';
+}
+
+int main(void) {
+    int a;
+
+    a = 2147483647;
+    printf("%d\n", iskeywordoridstart(a));
+    printf("%d\n", iskeywordoridstart('A'));
+    printf("%d\n", iskeywordoridstart('%'));
+    printf("%d\n", iskeywordoridstart('z'));
+    printf("%d\n", iskeywordoridstart('f'));
+    printf("%d\n", iskeywordoridstart(')'));
+}
+
+/*
+ * OUTSTART
+0
+1
+0
+1
+1
+0
+ * OUTEND
+ */

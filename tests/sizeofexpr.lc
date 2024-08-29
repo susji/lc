@@ -1,0 +1,36 @@
+int printf(const char *fmt, ...);
+
+struct t {
+       int d;
+       int e;
+};
+
+struct s {
+       int a;
+       int b;
+       int c;
+       struct t inner;
+       struct t *innerptr;
+};
+
+int main(void) {
+    struct s big;
+    struct t small;
+    struct t smallarr[4];
+    int f;
+    char *g;
+
+    printf("%d %d\n", sizeof(big), sizeof(small));
+    printf("%d\n", sizeof(smallarr));
+    printf("%d\n", sizeof(f));
+    printf("%d %d\n", sizeof(g), sizeof(*g));
+}
+
+/*
+ * OUTSTART
+24 8
+32
+4
+4 1
+ * OUTEND
+ */

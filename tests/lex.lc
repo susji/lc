@@ -1,0 +1,696 @@
+#define NULL 0
+
+void *memcpy(void *, const void *, unsigned long);
+void *calloc(unsigned long, unsigned long);
+long strtol(const char *, char **, int);
+int asprintf(char **, const char *, ...);
+int strcmp(const char *, const char *);
+unsigned long strlen(const char *);
+char *strcpy(char *, const char *);
+int printf(const char *, ...);
+int puts(const char *);
+void free(void *);
+int isdigit(int);
+int isspace(int);
+
+static char CODE[1000000];
+static char *CURCODE = CODE;
+static int LINENO = 1;
+static int COL = 1;
+static int LEXERRS = 0;
+static int LEXWARNS = 0;
+
+struct tok {
+  int kind;
+  long i;
+  char c;
+  char *s;
+  int lineno;
+  int col;
+};
+
+static struct tok TOKS[100000];
+static struct tok *CURTOK = TOKS;
+
+enum Token {
+  ASSIGN_ADD = 128,
+  ASSIGN_AND,
+  ASSIGN_DIV,
+  ASSIGN_LEFT,
+  ASSIGN_OR,
+  ASSIGN_MOD,
+  ASSIGN_MUL,
+  ASSIGN_RIGHT,
+  ASSIGN_SUB,
+  ASSIGN_XOR,
+  AUTO,
+  BREAK,
+  CHAR,
+  CONST,
+  CONSTANT,
+  CONTINUE,
+  DEFAULT,
+  DOUBLE,
+  DO,
+  ELLIPSIS,
+  ELSE,
+  ENUM,
+  EXTERN,
+  FLOAT,
+  FOR,
+  GOTO,
+  ID,
+  IF,
+  INT,
+  LONG,
+  OP_AND,
+  OP_DEC,
+  OP_EQ,
+  OP_LE,
+  OP_LEFT,
+  OP_GE,
+  OP_INC,
+  OP_NE,
+  OP_OR,
+  OP_PTR,
+  OP_RIGHT,
+  REGISTER,
+  RETURN,
+  SHORT,
+  SIGNED,
+  SIZEOF,
+  STATIC,
+  STRLIT,
+  STRUCT,
+  SWITCH,
+  TYPEDEF,
+  UNION,
+  UNSIGNED,
+  VOID,
+  VOLATILE,
+  WHILE,
+  _END,
+};
+
+static char *TOKNAMES[] = {
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       "!",        "\"",         "#",
+    NULL,       "%",        "&",          "'",
+    "(",        ")",        "*",          "+",
+    ",",        "-",        ".",          "/",
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       ":",          ";",
+    "<",        "=",        ">",          "?",
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         "[",
+    NULL,       "]",        "^",          NULL,
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         NULL,
+    NULL,       NULL,       NULL,         "{",
+    "|",        "}",        "~",          NULL,
+    "+=",       "&=",       "/=",         "<<=",
+    "|=",       "%=",       "*=",         ">>=",
+    "-=",       "^=",       "auto",       "break",
+    "char",     "const",    "constant",   "continue",
+    "default",  "double",   "do",         "...",
+    "else",     "enum",     "extern",     "float",
+    "for",      "goto",     "identifier", "if",
+    "int",      "long",     "&&",         "--",
+    "==",       "<=",       "<<",         ">=",
+    "++",       "!=",       "||",         "->",
+    ">>",       "register", "return",     "short",
+    "signed",   "sizeof",   "static",     "string literal",
+    "struct",   "switch",   "typedef",    "union",
+    "unsigned", "void",     "volatile",   "while",
+    "the end",
+};
+
+static char *KEYWORDS[] = {
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    "auto",     "break",    "char",     "const",  NULL,      "continue",
+    "default",  "double",   "do",       NULL,     "else",    "enum",
+    "extern",   "float",    "for",      "goto",   NULL,      "if",
+    "int",      "long",     NULL,       NULL,     NULL,      NULL,
+    NULL,       NULL,       NULL,       NULL,     NULL,      NULL,
+    NULL,       "register", "return",   "short",  "signed",  "sizeof",
+    "static",   NULL,       "struct",   "switch", "typedef", "union",
+    "unsigned", "void",     "volatile", "while",  NULL,
+};
+
+void lexemit(int kind) {
+  CURTOK->kind = kind;
+  CURTOK->lineno = LINENO;
+  CURTOK->col = COL;
+  ++CURTOK;
+}
+
+void lexemiti(int kind, int i) {
+  CURTOK->i = i;
+  lexemit(kind);
+}
+
+void lexemitc(int kind, char c) {
+  CURTOK->c = c;
+  lexemit(kind);
+}
+
+void lexemits(int kind, char *s) {
+  CURTOK->s = s;
+  lexemit(kind);
+}
+
+int lexpeek(void) {
+  return *CURCODE;
+}
+
+void lexerr(char *e) {
+  ++LEXERRS;
+  printf("error: %d:%d (%c): %s\n", LINENO, COL, lexpeek(), e);
+}
+
+void lexwarn(char *e) {
+  ++LEXWARNS;
+  printf("warning: %d:%d (%c): %s\n", LINENO, COL, lexpeek(), e);
+}
+
+void lexnext(void) {
+  if (*CURCODE == '\n') {
+    COL = 1;
+    ++LINENO;
+  } else {
+    ++COL;
+  }
+  ++CURCODE;
+}
+
+int lexexpect(char want) {
+  char got;
+
+  got = lexpeek();
+  if (got != want) {
+    char *msg;
+    asprintf(&msg, "found '%c' expecting '%c", got, want);
+    lexerr(msg);
+    free(msg);
+    return 1;
+  }
+  lexnext();
+  return 0;
+}
+
+int iskeywordoridstart(char c) {
+  return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_';
+}
+
+int iskeywordorid(char c) {
+  return iskeywordoridstart(c) || (c >= '0' && c <= '9');
+}
+
+int lexstrlit(void) {
+  int escaped;
+  char *s;
+  char c;
+  int n;
+
+  s = calloc(1024, 1);
+  escaped = 0;
+  n = 0;
+  if (lexexpect('"')) {
+    lexerr("string literal must begin with '\"'");
+    return 1;
+  }
+  while ((c = lexpeek()) != 0) {
+    /*printf("strlit[%d,%d]=%c (0x%x) -> %s (%lu)\n", n, escaped, c, c, s,
+           strlen(s));*/
+    if (escaped) {
+      escaped = 0;
+      if (c == 'n') {
+        s[n] = '\n';
+      } else if (c == 't') {
+        s[n] = '\t';
+      } else if (c == 'r') {
+        s[n] = '\r';
+      } else if (c == 'f') {
+        s[n] = '\f';
+      } else if (c == 'v') {
+        s[n] = '\v';
+      } else if (c == '0') {
+        s[n] = 0;
+      } else if (c == '"') {
+        s[n] = '"';
+      } else if (c == '\\') {
+        s[n] = '\\';
+      } else {
+        lexerr("unknown escape character");
+      }
+    } else {
+      if (c == '"') {
+        lexexpect('"');
+        lexemits(STRLIT, s);
+        return 0;
+      } else if (c == '\\') {
+        escaped = 1;
+        /* We need to avoid the n++ below when reading the escape as we're not
+           printing a character in this branch. */
+        lexnext();
+        continue;
+      } else {
+        s[n] = c;
+      }
+    }
+    ++n;
+    lexnext();
+  }
+  lexerr("non-terminated string literal");
+  return 1;
+}
+
+int lexchar(void) {
+  char c;
+
+  if (lexexpect('\'')) {
+    lexerr("character literal must begin with '");
+    return 1;
+  }
+  c = lexpeek();
+  if (c == '\\') {
+    lexnext();
+    c = lexpeek();
+    if (c == 'n') {
+      c = '\n';
+    } else if (c == 't') {
+      c = '\t';
+    } else if (c == 'r') {
+      c = '\r';
+    } else if (c == 'f') {
+      c = '\f';
+    } else if (c == 'v') {
+      c = '\v';
+    } else if (c == '0') {
+      c = 0;
+    } else if (c == '"') {
+      c = '"';
+    } else if (c == '\\') {
+      c = '\\';
+    } else if (c == '\'') {
+      c = '\'';
+    } else {
+      lexerr("unknown escape character");
+      return 1;
+    }
+  }
+  lexnext();
+  if (lexexpect('\'')) {
+    lexerr("non-terminated character literal");
+    return 1;
+  }
+  lexemitc(CHAR, c);
+  return 0;
+}
+
+int lexkeywordorid(void) {
+  char *id;
+  char *c;
+  int n;
+
+  id = calloc(64, 1);
+  c = id;
+  n = 0;
+  while (iskeywordorid(lexpeek())) {
+    *c = lexpeek();
+    ++c;
+    lexnext();
+    ++n;
+    if (n == 64) {
+      lexerr("keyword or identifier too long");
+      free(id);
+      return 1;
+    }
+  }
+  /*printf("AAA='%s'\n", id);*/
+  n = 0;
+  while (n < (sizeof(KEYWORDS) / sizeof(KEYWORDS[0]))) {
+    if (KEYWORDS[n] && !strcmp(KEYWORDS[n], id)) {
+      /* printf("match[%lu]: id=%s keyword=%s\n", n, id, KEYWORDS[n]);*/
+      lexemit(n);
+      free(id);
+      return 0;
+    }
+    ++n;
+  }
+  lexemits(ID, id);
+  return 0;
+}
+
+int lexnum(void) {
+  char *raw;
+  int i;
+  long long res;
+
+  raw = calloc(22, 1);
+  i = 0;
+  while (isdigit(lexpeek())) {
+    if (i == 21) {
+      lexerr("number too long");
+      free(raw);
+      return 1;
+    }
+    raw[i] = lexpeek();
+    lexnext();
+    ++i;
+  }
+  res = strtol(raw, NULL, 10);
+  if (res == 0 && strlen(raw) != 1 && raw[0] != '0') {
+    lexerr("bad number");
+    free(raw);
+    return 1;
+  }
+  lexemiti(CONSTANT, res);
+  free(raw);
+  return 0;
+}
+
+int lexcomment(void) {
+  while (1) {
+    if (lexpeek() == 0) {
+      return 1;
+    } else if (lexpeek() == '*') {
+      lexexpect('*');
+      if (lexpeek() == '/') {
+        lexexpect('/');
+        return 0;
+      }
+    } else {
+      lexnext();
+    }
+  }
+  return 0;
+}
+
+int lexop(void) {
+  char c;
+
+  c = lexpeek();
+  /* I know.  */
+  if (c == '.') {
+    lexexpect('.');
+    if (lexpeek() == '.') {
+      lexexpect('.');
+      if (lexexpect('.')) {
+        lexerr("expecting third . for ellipsis");
+        return 1;
+      }
+      lexemit(ELLIPSIS);
+      return 0;
+    }
+    lexemit('.');
+    return 0;
+  } else if (c == '>') {
+    lexexpect('>');
+    if (lexpeek() == '>') {
+      lexexpect('>');
+      if (lexpeek() == '=') {
+        lexexpect('=');
+        lexemit(ASSIGN_RIGHT);
+        return 0;
+      }
+      lexemit(OP_RIGHT);
+      return 0;
+    } else if (lexpeek() == '=') {
+      lexexpect('=');
+      lexemit(OP_GE);
+      return 0;
+    }
+    lexemit('>');
+    return 0;
+  } else if (c == '<') {
+    lexexpect('<');
+    if (lexpeek() == '<') {
+      lexexpect('<');
+      if (lexpeek() == '=') {
+        lexexpect('=');
+        lexemit(ASSIGN_LEFT);
+        return 0;
+      }
+      lexemit(OP_LEFT);
+      return 0;
+    } else if (lexpeek() == '=') {
+      lexexpect('=');
+      lexemit(OP_LE);
+      return 0;
+    }
+    lexemit('<');
+    return 0;
+  } else if (c == '+') {
+    lexexpect('+');
+    if (lexpeek() == '=') {
+      lexexpect('=');
+      lexemit(ASSIGN_ADD);
+      return 0;
+    } else if (lexpeek() == '+') {
+      lexexpect('+');
+      lexemit(OP_INC);
+      return 0;
+    }
+    lexemit('+');
+    return 0;
+  } else if (c == '-') {
+    lexexpect('-');
+    if (lexpeek() == '=') {
+      lexexpect('=');
+      lexemit(ASSIGN_SUB);
+      return 0;
+    } else if (lexpeek() == '-') {
+      lexexpect('-');
+      lexemit(OP_DEC);
+      return 0;
+    } else if (lexpeek() == '>') {
+      lexexpect('>');
+      lexemit(OP_PTR);
+      return 0;
+    }
+    lexemit('-');
+    return 0;
+  } else if (c == '*') {
+    lexexpect('*');
+    if (lexpeek() == '=') {
+      lexexpect('=');
+      lexemit(ASSIGN_MUL);
+      return 0;
+    }
+    lexemit('*');
+    return 0;
+  } else if (c == '/') {
+    lexexpect('/');
+    if (lexpeek() == '=') {
+      lexexpect('=');
+      lexemit(ASSIGN_DIV);
+      return 0;
+    } else if (lexpeek() == '*') {
+      lexexpect('*');
+      return lexcomment();
+    }
+    lexemit('/');
+    return 0;
+  } else if (c == '&') {
+    lexexpect('&');
+    if (lexpeek() == '=') {
+      lexexpect('=');
+      lexemit(ASSIGN_AND);
+      return 0;
+    } else if (lexpeek() == '&') {
+      lexexpect('&');
+      lexemit(OP_AND);
+      return 0;
+    }
+    lexemit('&');
+    return 0;
+  } else if (c == '^') {
+    lexexpect('^');
+    if (lexpeek() == '=') {
+      lexexpect('=');
+      lexemit(ASSIGN_XOR);
+      return 0;
+    }
+    lexemit('^');
+    return 0;
+  } else if (c == '%') {
+    lexexpect('%');
+    if (lexpeek() == '=') {
+      lexexpect('=');
+      lexemit(ASSIGN_MOD);
+      return 0;
+    }
+    lexemit('%');
+    return 0;
+  } else if (c == '|') {
+    lexexpect('|');
+    if (lexpeek() == '=') {
+      lexexpect('=');
+      lexemit(ASSIGN_OR);
+      return 0;
+    } else if (lexpeek() == '|') {
+      lexexpect('|');
+      lexemit(OP_OR);
+      return 0;
+    }
+    lexemit('|');
+    return 0;
+  } else if (c == '!') {
+    lexexpect('!');
+    if (lexpeek() == '=') {
+      lexexpect('=');
+      lexemit(OP_NE);
+      return 0;
+    }
+    lexemit('!');
+    return 0;
+  } else if (c == '=') {
+    lexexpect('=');
+    if (lexpeek() == '=') {
+      lexexpect('=');
+      lexemit(OP_EQ);
+      return 0;
+    }
+    lexemit('=');
+    return 0;
+  } else if (c == '?' || c == ':' || c == '~' || c == ',' || c == '*') {
+    lexexpect(c);
+    lexemit(c);
+    return 0;
+  }
+  return 1;
+}
+
+int isopstart(char c) {
+  return c == '.' || c == '>' || c == '<' || c == '+' || c == '-' || c == '*' ||
+         c == '%' || c == '&' || c == '^' || c == '|' || c == '!' || c == '~' ||
+         c == '/' || c == '?' || c == ':' || c == '=' || c == ',';
+}
+
+int lexff(char w) {
+  char c;
+
+  while ((c = lexpeek()) != 0) {
+    if (c == w) {
+      return 0;
+    }
+    lexnext();
+  }
+  return 1;
+}
+
+void lex(void) {
+  char c;
+
+  while ((c = lexpeek())) {
+    int err;
+
+    /*printf("c=%c\n", c);*/
+    err = 0;
+    if (c == '"') {
+      err = lexstrlit();
+    } else if (c == '\'') {
+      err = lexchar();
+    } else if (iskeywordoridstart(c)) {
+      err = lexkeywordorid();
+    } else if (isspace(c)) {
+      lexnext();
+    } else if (isopstart(c)) {
+      err = lexop();
+    } else if (c == ';' || c == '{' || c == '}' || c == '[' || c == ']' ||
+               c == '(' || c == ')') {
+      lexemit(c);
+      lexnext();
+    } else if (c == '#') {
+      lexwarn("skipping preprocessor directive");
+      lexff('\n');
+    } else if (isdigit(c)) {
+      err = lexnum();
+    } else {
+      lexerr("unidentified character");
+      err = 1;
+    }
+    if (err) {
+      lexff('\n');
+    }
+  }
+  lexemit(_END);
+}
+
+
+int main(void) {
+    struct tok *t;
+    char *code;
+
+    code = "int helloworld(char *f) { printf(\"Hello World!\"); }";
+    memcpy(CODE, code, strlen(code));
+    lex();
+    t = TOKS;
+    while (t->kind != _END) {
+          printf("%s", TOKNAMES[t->kind]);
+          if (t->s) {
+             printf(" %s", t->s);
+          }
+          printf("\n");
+          ++t;
+    }
+}
+
+/*
+ * OUTSTART
+int
+identifier helloworld
+(
+char
+*
+identifier f
+)
+{
+identifier printf
+(
+string literal Hello World!
+)
+;
+}
+ * OUTEND
+ */
