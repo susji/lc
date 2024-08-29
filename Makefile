@@ -5,6 +5,7 @@ TESTS = $(wildcard tests/*.lc)
 .EXPORT_ALL_VARIABLES:
 ASAN_OPTIONS=detect_leaks=0
 
+default: lc
 
 .PHONY: clean
 clean:
