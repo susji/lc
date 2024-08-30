@@ -1,5 +1,5 @@
 CC = cc
-CFLAGS = -fsanitize=address -D VERBOSE
+CFLAGS = -fsanitize=address
 TESTS = $(wildcard tests/*.lc)
 
 .EXPORT_ALL_VARIABLES:

@@ -18,6 +18,8 @@ int F_VOLATILE = 1 << 16;
 int F_TYPEDEFVAR = 1 << 17;
 int F_ANY = 1 << 18;
 
+static int VERBOSE = 0;
+
 #define NULL (void *)0
 
 extern int fclose(void *);
@@ -342,10 +344,10 @@ void scopeappendvar(struct scope *s, char *name, int instack, int isparam,
   }
   sz = getnodevarsize(n);
   stacksz = ceilto(sz, 4);
-#ifdef VERBOSE
-  printf("[scope=%s] adding variable: %s (sz=%d, stacksz=%d)\n", s->id, name,
-         sz, stacksz);
-#endif
+  if (VERBOSE) {
+    printf("[scope=%s] adding variable: %s (sz=%d, stacksz=%d)\n", s->id, name,
+           sz, stacksz);
+  }
   *sv = calloc(1, sizeof(struct scopevar));
   (*sv)->name = name;
   (*sv)->this = n;
@@ -1686,10 +1688,10 @@ struct node *node(int kind, struct tok *tok) {
   }
   n->n = NODEN;
   ++NODEN;
-#ifdef VERBOSE
-  printf("[new node {%d}] %s (%s)\n", n->n, NODENAMES[kind],
-         TOKNAMES[n->tok->kind]);
-#endif
+  if (VERBOSE) {
+    printf("[new node {%d}] %s (%s)\n", n->n, NODENAMES[kind],
+           TOKNAMES[n->tok->kind]);
+  }
   return n;
 }
 
@@ -1814,31 +1816,31 @@ struct node *atom(void) {
     return e;
   } else if (c == CONSTANT) {
     e = node(N_CONSTANT, NULL);
-#ifdef VERBOSE
-    printf("[number] %ld\n", e->tok->i);
-#endif
+    if (VERBOSE) {
+      printf("[number] %ld\n", e->tok->i);
+    }
     parsenext();
     return e;
   } else if (c == STRLIT) {
     e = node(N_STRLIT, NULL);
-#ifdef VERBOSE
-    printf("[string] %s\n", e->tok->s);
-#endif
+    if (VERBOSE) {
+      printf("[string] %s\n", e->tok->s);
+    }
     parsenext();
     return e;
   } else if (c == CHAR) {
     e = node(N_CHAR, NULL);
-#ifdef VERBOSE
-    printf("[character] %c\n", e->tok->c);
-#endif
+    if (VERBOSE) {
+      printf("[character] %c\n", e->tok->c);
+    }
     parsenext();
     return e;
   } else if (c == '~' || c == '!' || c == OP_INC || c == OP_DEC || c == '&' ||
              c == '+' || c == '*' || c == '-') {
     e = node(OP_UN, NULL);
-#ifdef VERBOSE
-    printf("[opun] %s (prec=%d)\n", TOKNAMES[c], PRECUN[c]);
-#endif
+    if (VERBOSE) {
+      printf("[opun] %s (prec=%d)\n", TOKNAMES[c], PRECUN[c]);
+    }
     parsenext();
     e->left = expr(PRECUN[c]);
     return e;
@@ -1855,9 +1857,9 @@ struct node *atom(void) {
       parsenext();
       if (!(t = typespecorqual())) {
         e = node(N_SIZEOF_EXPR, otok);
-#ifdef VERBOSE
-        printf("[opun] %s (prec=%d)\n", TOKNAMES[SIZEOF], PRECUN[SIZEOF]);
-#endif
+        if (VERBOSE) {
+          printf("[opun] %s (prec=%d)\n", TOKNAMES[SIZEOF], PRECUN[SIZEOF]);
+        }
         e->left = expr(PRECUN[SIZEOF]);
         if (parseexpect(')')) {
           parseerr("unbalanced parentheses in sizeof expression");
@@ -1876,9 +1878,9 @@ struct node *atom(void) {
       return e;
     } else {
       e = node(N_SIZEOF_EXPR, otok);
-#ifdef VERBOSE
-      printf("[opun] %s (prec=%d)\n", TOKNAMES[SIZEOF], PRECUN[SIZEOF]);
-#endif
+      if (VERBOSE) {
+        printf("[opun] %s (prec=%d)\n", TOKNAMES[SIZEOF], PRECUN[SIZEOF]);
+      }
       e->left = expr(PRECUN[SIZEOF]);
       return e;
     }
@@ -1895,9 +1897,9 @@ struct node *expr(int minprec) {
   struct node *left;
 
   parseentry("expr");
-#ifdef VERBOSE
-  printf("minprec=%d\n", minprec);
-#endif
+  if (VERBOSE) {
+    printf("minprec=%d\n", minprec);
+  }
   if (parsepeek() == ',' || parsepeek() == ';' || parsepeek() == ')' ||
       parsepeek() == ']' || parsepeek() == _END) {
     return NULL;
@@ -1912,14 +1914,14 @@ struct node *expr(int minprec) {
     struct node *e;
 
     c = parsepeek();
-#ifdef VERBOSE
-    printf("[expr] %s", TOKNAMES[c]);
-    if (CURTOK->s) {
-      printf("=%s\n", CURTOK->s);
-    } else {
-      puts("");
+    if (VERBOSE) {
+      printf("[expr] %s", TOKNAMES[c]);
+      if (CURTOK->s) {
+        printf("=%s\n", CURTOK->s);
+      } else {
+        puts("");
+      }
     }
-#endif
     if (c == '(') {
       prec = PRECBIN['('];
       if (prec < minprec) {
@@ -1959,9 +1961,9 @@ struct node *expr(int minprec) {
       } else {
         nextminprec = prec;
       }
-#ifdef VERBOSE
-      printf("[opbin] %s (prec=%d)\n", CURTOK->s, prec);
-#endif
+      if (VERBOSE) {
+        printf("[opbin] %s (prec=%d)\n", CURTOK->s, prec);
+      }
       e = node(OP_BIN, CURTOK);
       e->left = left;
       parsenext();
@@ -2198,9 +2200,7 @@ int constantexpression(void) {
    */
   parseentry("constantexpression");
   n = expr(1);
-  nodedump(0, n);
   i = evalconstexpr(n);
-  printf("constevalexpr=%d\n", i);
   return i;
 }
 
@@ -2439,9 +2439,9 @@ struct node *fundefordecl(void) {
   while (parsepeek() != _END) {
     struct node *ds = declarationspecifiers();
     flags = *(int *)ds->data;
-#ifdef VERBOSE
-    printf("flags=0x%x\n", flags);
-#endif
+    if (VERBOSE) {
+      printf("flags=0x%x\n", flags);
+    }
     if (!flags) {
       parseerr("invalid type-specifier for function argument");
       return NULL;
@@ -2537,9 +2537,9 @@ struct node *declarator(void) {
   plvl = pointer();
   if (parsepeek() == ID) {
     nid = node(N_ID, NULL);
-#ifdef VERBOSE
-    printf("declarator id=%s\n", CURTOK->s);
-#endif
+    if (VERBOSE) {
+      printf("declarator id=%s\n", CURTOK->s);
+    }
     parsenext();
   } else if (parsepeek() == '(') {
     parsenext();
@@ -2760,9 +2760,9 @@ struct node *declarationorfundef(void) {
     return NULL;
   }
   flags = *(int *)ds->data;
-#ifdef VERBOSE
-  printf("flags=0x%x\n", flags);
-#endif
+  if (VERBOSE) {
+    printf("flags=0x%x\n", flags);
+  }
   /* If we didn't get a type-specifier, it cannot be a valid declaration. */
   if (!flags) {
     parseerr("invalid type-specifier");
@@ -2774,9 +2774,9 @@ struct node *declarationorfundef(void) {
     return NULL;
   }
   nd = getnodedeclarator(d);
-#ifdef VERBOSE
-  printf("arrsz=%d, plvl=%d\n", nd->arrsz, nd->plvl);
-#endif
+  if (VERBOSE) {
+    printf("arrsz=%d, plvl=%d\n", nd->arrsz, nd->plvl);
+  }
   if (parsepeek() == '=') {
     parsenext();
     if (!(init = initializer())) {
@@ -2800,9 +2800,9 @@ struct node *declarationorfundef(void) {
         nd->arrsz = i;
       } else if (init->kind == INITIALIZER && init->tok->kind == STRLIT) {
         nd->arrsz = strlen(init->tok->s) + 1;
-#ifdef VERBOSE
-        printf("deduced arrsz=%d\n", nd->arrsz);
-#endif
+        if (VERBOSE) {
+          printf("deduced arrsz=%d\n", nd->arrsz);
+        }
       } else {
         parseerr("unspecified array size with bad initializer");
         parseerr(TOKNAMES[init->tok->kind]);
@@ -3333,7 +3333,6 @@ struct type *checktypecasttype(struct scope *s, struct node *n) {
   struct type *ty;
 
   ty = checkdecltype(n);
-  nodedump(0, n);
   checkexprtype(s, n->right);
   setnodetype(n->right, ty);
   return ty;
@@ -4166,7 +4165,6 @@ void emitvarsinit(void) {
       while (cur) {
         int tk;
 
-        nodedump(0, cur->left);
         tk = cur->left->kind;
         if (tk == N_CONSTANT) {
           asprintf(&e, "%ld", cur->left->tok->i);
@@ -4806,7 +4804,6 @@ void emitsizeoftype(struct scope *s, struct node *n) {
   emitln("# sizeof type");
   d = n->left;
   _assert(d != NULL, "sizeof lacks declarator");
-  nodedump(0, d);
   nd = getnodedeclarator(d);
   _assert(nd != NULL, "sizeof lacks nodedeclarator");
   atomsz = typeatomsize(n->type->inner);
@@ -4890,7 +4887,6 @@ void emitexpr(struct scope *s, struct node *n) {
   char *str;
   int k;
   puts("emitexpr");
-  nodedump(0, n);
   k = n->kind;
   /* This could of course be a jump table. */
   if (k == FUNCALL) {
@@ -5244,7 +5240,6 @@ void emitfuncs(void) {
     name = (*cur)->name;
     bl = getfundefblock((*cur)->def);
     ssize = bl->scope->ssize;
-    nodedump(0, bl);
     emit("# emitting function: ");
     emitln(name);
     /* FIXME We expose all functions by default. */
@@ -5348,14 +5343,14 @@ int main(int argc, char *argv[]) {
   CODE[sizeof(CODE) - 1] = 0;
   puts("Tokenizing...");
   lex();
-#ifdef VERBOSE
-  toksdump();
-#endif
+  if (VERBOSE) {
+    toksdump();
+  }
   parse();
-#ifdef VERBOSE
-  nodesdump();
-  printf("[tuscope=%p]\n", &tuscope);
-#endif
+  if (VERBOSE) {
+    nodesdump();
+    printf("[tuscope=%p]\n", &tuscope);
+  }
   tuscope.id = "translation-unit";
   while (*n) {
     printf("----- [%04d] -----\n", i);
@@ -5364,16 +5359,16 @@ int main(int argc, char *argv[]) {
     ++i;
     ++n;
   }
-#ifdef VERBOSE
-  scopedump(&tuscope);
-  dumpfuncdecls();
-  dumpfuncdefs();
-  dumpstructdefs();
-  dumptypedefs();
-  dumpenums();
-  dumpenumrs();
-  dumpstructdefs();
-#endif
+  if (VERBOSE) {
+    scopedump(&tuscope);
+    dumpfuncdecls();
+    dumpfuncdefs();
+    dumpstructdefs();
+    dumptypedefs();
+    dumpenums();
+    dumpenumrs();
+    dumpstructdefs();
+  }
   codegen();
 
   return 0;
