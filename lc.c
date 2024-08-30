@@ -4082,7 +4082,6 @@ char *escapestrlit(char *s, int ischarlit) {
     ++src;
     ++dst;
   }
-  puts(ret);
   return ret;
 }
 
