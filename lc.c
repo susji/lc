@@ -3933,8 +3933,9 @@ void checkfunc(char *name, struct scope *global, struct node *f) {
   putv("----- [function statements] -----");
   n = bl->right;
   while (n) {
-    if (VERBOSE)
+    if (VERBOSE) {
       printf("---- statement --- %s\n", NODENAMES[n->kind]);
+    }
     checkstmt(bl->scope, n);
     n = n->next;
   }
