@@ -4705,9 +4705,7 @@ void emitfuncall(struct scope *s, struct node *n) {
     ty = checkdecltype(f->def);
     if (ty->flags & F_STRUCT) {
       if (ty->plvl == 0) {
-        die("emitexpr", "we do not know how to handle struct as a return "
-                        "value "
-                        "yet");
+        die("emitexpr", "struct as return value");
       }
     }
     emitln("mov %eax, %esi");
