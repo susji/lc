@@ -2162,7 +2162,6 @@ struct node *typedefname(void) {
 int evalconstexpr(struct node *n) {
   int k;
 
-  printf("evalconstexpr: %s\n", NODENAMES[n->kind]);
   k = n->kind;
   if (k == N_CONSTANT) {
     return n->tok->i;
@@ -4060,7 +4059,9 @@ void emit(char *str) {
     return;
   }
   fwrite(str, 1, strlen(str), GEN);
-  printf("emitted: %s\n", str);
+  if (VERBOSE) {
+    printf("emitted: %s\n", str);
+  }
 }
 
 void emitln(char *str) {
@@ -5316,17 +5317,29 @@ void codegen(void) {
   fclose(GEN);
 }
 
-int main(int argc, char *argv[]) {
+void dumpnodes(void) {
   struct node **n;
+  int i;
+
+  i = 1;
+  n = NODES;
+  puts("all nodes");
+  while (*n) {
+    printf("----- [%04d] -----\n", i);
+    nodedump(0, *n);
+    checkdecl(&tuscope, *n, 0);
+    ++i;
+    ++n;
+  }
+}
+
+int main(int argc, char *argv[]) {
   char line[1024];
   int inerr;
   int rv;
   int r;
-  int i;
 
   inerr = 0;
-  i = 1;
-  n = NODES;
   strcat(CODE, "void *NULL = 0;\n");
   r = strlen(CODE);
   while (1) {
@@ -5354,14 +5367,10 @@ int main(int argc, char *argv[]) {
     printf("[tuscope=%p]\n", &tuscope);
   }
   tuscope.id = "translation-unit";
-  while (*n) {
-    printf("----- [%04d] -----\n", i);
-    nodedump(0, *n);
-    checkdecl(&tuscope, *n, 0);
-    ++i;
-    ++n;
+  if (VERBOSE) {
   }
   if (VERBOSE) {
+    dumpnodes();
     scopedump(&tuscope);
     dumpfuncdecls();
     dumpfuncdefs();
@@ -5372,6 +5381,5 @@ int main(int argc, char *argv[]) {
     dumpstructdefs();
   }
   codegen();
-
   return 0;
 }
