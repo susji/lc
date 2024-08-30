@@ -2714,10 +2714,10 @@ struct node *typespecorqual(void) {
   } else if ((n = typedefname())) {
     flags |= F_TYPEDEFVAR;
   } else if (c == CONST) {
-    flags = F_CONST;
+    flags |= F_CONST;
     parsenext();
   } else if (c == VOLATILE) {
-    flags = F_VOLATILE;
+    flags |= F_VOLATILE;
     parsenext();
   } else {
     return NULL;
