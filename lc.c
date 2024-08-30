@@ -71,6 +71,12 @@ void die(char *ctx, char *msg) {
   puts(NULL);
 }
 
+void putv(const char *m) {
+  if (VERBOSE) {
+    puts(m);
+  }
+}
+
 int ceilto(int val, int ceil) {
   return ((val + ceil - 1) & ~(ceil - 1));
 }
@@ -325,7 +331,9 @@ struct scope *newscope(char *id, struct scope *parent, int isfunc) {
   ret->sshift = sshift;
   ret->ssize = 0;
   ret->isfunc = isfunc;
-  printf("[new scope=%s] parent=%s\n", ret->id, ret->parent->id);
+  if (VERBOSE) {
+    printf("[new scope=%s] parent=%s\n", ret->id, ret->parent->id);
+  }
   return ret;
 }
 
@@ -1658,8 +1666,10 @@ void parseentry(char *which) {
 }
 
 void checkentry(char *which, struct node *n) {
-  printf("%28s:%d:%d: %s\n", which, n->tok->lineno, n->tok->col,
-         NODENAMES[n->kind]);
+  if (VERBOSE) {
+    printf("%28s:%d:%d: %s\n", which, n->tok->lineno, n->tok->col,
+           NODENAMES[n->kind]);
+  }
 }
 
 int isopbinary(int kind) {
@@ -3044,7 +3054,9 @@ void evalstructdef(struct node *n) {
     ++i;
   }
   sd->memsz = cursz;
-  structdefdump(sd);
+  if (VERBOSE) {
+    structdefdump(sd);
+  }
   structdefappend(STRUCTDEFS, sd);
 }
 
@@ -3482,13 +3494,15 @@ int isdeclenum(struct node *n) {
 void checkenum(struct node *n) {
   char *name = getdeclenumname(n);
   struct node *fe = getdeclfirstenumerator(n);
-  if (name) {
-    printf("- enum: %s\n", name);
-  } else {
-    puts("- enum: anonymous");
+  if (VERBOSE) {
+    if (name) {
+      printf("- enum: %s\n", name);
+    } else {
+      puts("- enum: anonymous");
+    }
   }
   if (fe) {
-    puts("- enum: definition");
+    putv("- enum: definition");
     if (defpairfind(ENUMS, name)) {
       checkerr(n, "enumeration with this name already defined");
     } else {
@@ -3500,7 +3514,9 @@ void checkenum(struct node *n) {
         if (cur->right) {
           i = evalconstexpr(cur->right);
         }
-        printf("  - enumerator: %s (%d)\n", ename, i);
+        if (VERBOSE) {
+          printf("  - enumerator: %s (%d)\n", ename, i);
+        }
         if (strintpairfindstr(ENUMRS, ename)) {
           checkerr(cur, "enumerator already defined");
         } else {
@@ -3513,16 +3529,18 @@ void checkenum(struct node *n) {
     }
 
   } else {
-    puts("- enum: not defining");
+    putv("- enum: not defining");
   }
 }
 
 void checkstruct(struct node *n) {
   char *name = getdeclstructname(n);
   if (!name) {
-    puts(" - struct: anonymous");
+    putv(" - struct: anonymous");
   } else {
-    printf("- struct: %s\n", name);
+    if (VERBOSE) {
+      printf("- struct: %s\n", name);
+    }
     evalstructdef(n);
   }
 }
@@ -3887,29 +3905,36 @@ void checkfunc(char *name, struct scope *global, struct node *f) {
    * only the stack shift `sshift` is really meaningful for nested scopes...
    */
   bl->scope = newscope(name, global, 1);
-  puts("----- [function return value] -----");
-  if (f->data) {
-    nodedump(0, ((struct node *)f->data)->left);
+  if (VERBOSE) {
+    puts("----- [function return value] -----");
+    if (f->data) {
+      nodedump(0, ((struct node *)f->data)->left);
+    }
   }
-  puts("----- [function arguments] -----");
   n = f->left->right->left;
+  putv("----- [function arguments] -----");
   while (n) {
-    nodedump(0, n);
+    if (VERBOSE) {
+      nodedump(0, n);
+    }
     checkdecl(bl->scope, n, 1);
     n = n->next;
   }
-  puts("----- [function declarations] -----");
+  putv("----- [function declarations] -----");
   np = &bl->left;
   while (*np) {
-    nodedump(0, *np);
+    if (VERBOSE) {
+      nodedump(0, *np);
+    }
     checkdecl(bl->scope, *np, 0);
     *np = rewriteenumerators(bl->scope, *np);
     np = &(*np)->next;
   }
-  puts("----- [function statements] -----");
+  putv("----- [function statements] -----");
   n = bl->right;
   while (n) {
-    printf("---- statement --- %s\n", NODENAMES[n->kind]);
+    if (VERBOSE)
+      printf("---- statement --- %s\n", NODENAMES[n->kind]);
     checkstmt(bl->scope, n);
     n = n->next;
   }
@@ -3917,7 +3942,7 @@ void checkfunc(char *name, struct scope *global, struct node *f) {
    * We do some crude lowering here for certain parts of the language.
    */
   np = &bl->right;
-  puts("----- [lowering function statements] -----");
+  putv("----- [lowering function statements] -----");
   while (*np) {
     *np = rewritelvalue(bl->scope, *np, 0);
     *np = rewriteaddrshift(bl->scope, *np);
@@ -3940,7 +3965,9 @@ void checkdecl(struct scope *scope, struct node *n, int isparam) {
   if (n->kind == DECLARATION || n->kind == FUNARGDEF) {
     if (isdeclfundef(n)) {
       char *name = getdeclfuncname(n);
-      printf("- function definition: %s\n", name);
+      if (VERBOSE) {
+        printf("- function definition: %s\n", name);
+      }
       if (defpairfind(FUNCDEFS, name)) {
         checkerr(n, "function with this name already defined");
       } else {
@@ -3965,7 +3992,9 @@ void checkdecl(struct scope *scope, struct node *n, int isparam) {
         scopeappendvar(scope, id->tok->s, instack, isparam, 0, n);
       } else {
         char *name = getdeclfuncname(n);
-        printf("- function declaration: %s\n", name);
+        if (VERBOSE) {
+          printf("- function declaration: %s\n", name);
+        }
         if (defpairfind(FUNCDECLS, name)) {
           /*
            * FIXME multiple declarations are fine as long as they don't
@@ -3979,18 +4008,19 @@ void checkdecl(struct scope *scope, struct node *n, int isparam) {
     } else if (isdeclvar(n) && !isdecltypedef(n)) {
       int isextern;
 
-      puts("- variable");
+      putv("- variable");
       if (isdecltypedefvar(n)) {
-        puts("  - typedef'd");
+        putv("  - typedef'd");
       }
       if (isdeclenum(n)) {
         checkenum(n);
       }
       if ((t = getdeclinitializer(n))) {
         struct type *ty;
-        puts("  - initialized");
+        if (VERBOSE) {
+          puts("  - initialized");
+        }
         ty = checkdecltype(n);
-        typedump(ty);
         /* FIXME Generalize this with the other place. */
         if (ty->plvl > 0) {
           if (ty->flags & F_CHAR && t->kind == N_STRLIT) {
@@ -4525,8 +4555,10 @@ void emitopbin(struct scope *s, struct node *n) {
     }
 
     emitln("# binop (non-assigment)");
-    typedump(n->left->type);
-    typedump(n->right->type);
+    if (VERBOSE) {
+      typedump(n->left->type);
+      typedump(n->right->type);
+    }
 
     emitexpr(s, n->left);
     tk = n->tok->kind;
