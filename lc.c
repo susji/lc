@@ -1644,12 +1644,16 @@ void parseentry(char *which) {
   int c;
 
   c = parsepeek();
-  if (c == STRLIT || c == ID) {
-    printf("%28s:%d:%d: %s\n", which, CURTOK->lineno, CURTOK->col, CURTOK->s);
-  } else if (c == CONSTANT) {
-    printf("%28s:%d:%d: %ld\n", which, CURTOK->lineno, CURTOK->col, CURTOK->i);
-  } else {
-    printf("%28s:%d:%d: %s\n", which, CURTOK->lineno, CURTOK->col, TOKNAMES[c]);
+  if (VERBOSE) {
+    if (c == STRLIT || c == ID) {
+      printf("%28s:%d:%d: %s\n", which, CURTOK->lineno, CURTOK->col, CURTOK->s);
+    } else if (c == CONSTANT) {
+      printf("%28s:%d:%d: %ld\n", which, CURTOK->lineno, CURTOK->col,
+             CURTOK->i);
+    } else {
+      printf("%28s:%d:%d: %s\n", which, CURTOK->lineno, CURTOK->col,
+             TOKNAMES[c]);
+    }
   }
 }
 
@@ -5339,9 +5343,7 @@ int main(int argc, char *argv[]) {
       die("main", "too much input");
     }
   }
-  puts(CODE);
   CODE[sizeof(CODE) - 1] = 0;
-  puts("Tokenizing...");
   lex();
   if (VERBOSE) {
     toksdump();
