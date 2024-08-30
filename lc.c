@@ -2964,9 +2964,11 @@ int typecmpflags(int f) {
 }
 
 int aretypesequal(struct type *t1, struct type *t2) {
-  puts("===== aretypesequal =====");
-  typedump(t1);
-  typedump(t2);
+  if (VERBOSE) {
+    puts("===== aretypesequal =====");
+    typedump(t1);
+    typedump(t2);
+  }
   /* ellipsis involved */
   if (t1->flags & F_ANY || t2->flags & F_ANY) {
     return 1;
@@ -4393,7 +4395,6 @@ void emitopbin(struct scope *s, struct node *n) {
   char *e;
   int tk;
 
-  puts("emitopbin");
   tk = n->tok->kind;
   if (istokassign(tk)) {
     char *src;
@@ -4888,7 +4889,6 @@ void emitexpr(struct scope *s, struct node *n) {
   struct scopevar *var;
   char *str;
   int k;
-  puts("emitexpr");
   k = n->kind;
   /* This could of course be a jump table. */
   if (k == FUNCALL) {
@@ -5314,31 +5314,19 @@ void codegen(void) {
   fclose(GEN);
 }
 
-void dumpnodes(void) {
-  struct node **n;
-  int i;
-
-  i = 1;
-  n = NODES;
-  puts("all nodes");
-  while (*n) {
-    printf("----- [%04d] -----\n", i);
-    nodedump(0, *n);
-    checkdecl(&tuscope, *n, 0);
-    ++i;
-    ++n;
-  }
-}
-
 int main(int argc, char *argv[]) {
+  struct node **n;
   char line[1024];
   int inerr;
   int rv;
   int r;
+  int i;
 
   inerr = 0;
-  strcat(CODE, "void *NULL = 0;\n");
+  i = 1;
+  n = NODES;
   r = strlen(CODE);
+  strcat(CODE, "void *NULL = 0;\n");
   while (1) {
     memset(line, 0, 1024);
     rv = read(0, line, 1023);
@@ -5364,10 +5352,12 @@ int main(int argc, char *argv[]) {
     printf("[tuscope=%p]\n", &tuscope);
   }
   tuscope.id = "translation-unit";
-  if (VERBOSE) {
+  while (*n) {
+    checkdecl(&tuscope, *n, 0);
+    ++i;
+    ++n;
   }
   if (VERBOSE) {
-    dumpnodes();
     scopedump(&tuscope);
     dumpfuncdecls();
     dumpfuncdefs();
