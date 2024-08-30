@@ -4130,7 +4130,6 @@ void emitvarsinit(void) {
   char *e;
 
   nodeinit = STRINITS;
-  puts(">> emitting string initializers");
   while (*nodeinit) {
     asprintf(&e, "__node_%d: .asciz \"%s\"", (*nodeinit)->val,
              escapestrlit((*nodeinit)->name, 0));
