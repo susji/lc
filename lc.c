@@ -1,3 +1,9 @@
+/*
+ * susji 2024, GPL-3.0
+ *
+ * https://github.com/susji/lc
+ */
+
 int F_STRUCT = 1 << 0;
 int F_ENUM = 1 << 1;
 int F_VOID = 1 << 2;
