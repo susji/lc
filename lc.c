@@ -2997,7 +2997,7 @@ int aretypesequal(struct type *t1, struct type *t2) {
   /* ints and characters are comparable */
   if (((t1->flags & F_CHAR && t2->flags & F_INT) ||
        (t1->flags & F_INT && t2->flags & F_CHAR)) &&
-      t1->plvl == t2->plvl && t1->arrsz == t2->arrsz && t1->arrsz == 0) {
+      t1->plvl == t2->plvl && t1->arrsz == t2->arrsz && t1->arrsz == -1) {
     return 1;
   }
 
