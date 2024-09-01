@@ -2994,6 +2994,13 @@ int aretypesequal(struct type *t1, struct type *t2) {
       t1->plvl > 0) {
     return 1;
   }
+  /* ints and characters are comparable */
+  if (((t1->flags & F_CHAR && t2->flags & F_INT) ||
+       (t1->flags & F_INT && t2->flags & F_CHAR)) &&
+      t1->plvl == t2->plvl && t1->arrsz == t2->arrsz && t1->arrsz == 0) {
+    return 1;
+  }
+
   return typecmpflags(t1->flags) == typecmpflags(t2->flags) &&
          t1->plvl == t2->plvl && t1->arrsz == t2->arrsz;
 }
