@@ -1031,6 +1031,7 @@ void nodedump(int depth, struct node *n) {
            nd->arrsz);
   } else if (k == FUNARGDEF) {
     printf("%.*s{%d} FUNARGDEF\n", i, indent, n->n);
+    printf("%.*s[data]\n", i, indent);
     nodedump(depth + 1, n->data);
   } else if (k == INITIALIZER) {
     printf("%.*s{%d} INITIALIZER\n", i, indent, n->n);
@@ -2958,6 +2959,11 @@ int istypeindeclspecs(struct node *n, int type) {
   return 0;
 }
 
+int isdeclvoidargs(struct node *n) {
+  /* well, close enough... */
+  return n->kind == FUNARGDEF && istypeindeclspecs(n->data, F_VOID);
+}
+
 int isdecltypedef(struct node *n) {
   struct node *d;
   _assert(n->data != NULL, "isdecltypedef: data missing");
@@ -4005,7 +4011,9 @@ void checkdecl(struct scope *scope, struct node *n, int isparam) {
           }
           cur = cur->next;
         }
-        printf("- function pointer: %s (plvl=%d)\n", id->tok->s, plvl);
+        if (VERBOSE) {
+          printf("- function pointer: %s (plvl=%d)\n", id->tok->s, plvl);
+        }
         /* FIXME Bad way of checking whether we're in TU scope */
         scopeappendvar(scope, id->tok->s, instack, isparam, 0, n);
       } else {
@@ -4052,7 +4060,6 @@ void checkdecl(struct scope *scope, struct node *n, int isparam) {
            */
         }
       }
-
       isextern = getspecsflags(n->data) & F_EXTERN;
       scopeappendvar(scope, getdeclvarname(n), instack, isparam, isextern, n);
     } else if (isdeclstruct(n)) {
@@ -4060,8 +4067,11 @@ void checkdecl(struct scope *scope, struct node *n, int isparam) {
     } else if (isdeclenum(n)) {
       checkenum(n);
     } else if (isdecltypedef(n)) {
-      puts("- typedef");
+      putv("- typedef");
+    } else if (isdeclvoidargs(n)) {
+      putv("- void args");
     } else {
+      nodedump(0, n);
       checkerr(n, "unknown declaration");
     }
     checkdecltypes(scope, n);
