@@ -2979,6 +2979,11 @@ int typecmpflags(int f) {
          f & F_FLOAT | f & F_DOUBLE | f & F_TYPEDEF | f & F_TYPEDEFVAR;
 }
 
+int flagsmeanint(int f) {
+  /* It is what it is. */
+  return f & F_CHAR | f & F_INT | f & F_LONG | f & F_LONGLONG;
+}
+
 int aretypesequal(struct type *t1, struct type *t2) {
   if (VERBOSE) {
     puts("===== aretypesequal =====");
@@ -2994,9 +2999,8 @@ int aretypesequal(struct type *t1, struct type *t2) {
       t1->plvl > 0) {
     return 1;
   }
-  /* ints and characters are comparable */
-  if (((t1->flags & F_CHAR && t2->flags & F_INT) ||
-       (t1->flags & F_INT && t2->flags & F_CHAR)) &&
+  /* integers are integers, even if they aren't */
+  if ((flagsmeanint(t1->flags) && flagsmeanint(t2->flags)) &&
       t1->plvl == t2->plvl && t1->arrsz == t2->arrsz && t1->arrsz == -1) {
     return 1;
   }
