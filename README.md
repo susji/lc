@@ -13,10 +13,10 @@ an example, we treat all integers as word-sized.
 
 ## Bootstrapping and self-hosting
 
-We want produce `lc`, a version of the compiler compiled by the compiler itself.
-Bootstrapping is done by using any reasonably compliant C compiler to produce
-`lc0`. We self-compile the full compiler twice to ensure that `lc0` and `lc1`
-produce identical output. The steps are these:
+We want to produce `lc`, a version of the compiler compiled by the compiler
+itself. Bootstrapping is done by using any reasonably compliant C compiler to
+produce `lc0`. We self-compile the full compiler twice to ensure that `lc0` and
+`lc1` produce identical output. The steps are these:
 
 1. Compile the `lc0` executable with some existing C compiler
 2. Produce `lc1.s` with `lc0`
