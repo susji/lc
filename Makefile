@@ -34,6 +34,7 @@ lc0: lc.c
 	$(CC) -g -O0 -std=c89 -o $@ $^ $(CFLAGS)
 
 lc1.s: lc0
+	rm -f out.s
 	cat lc.c | ./lc0
 	mv out.s lc1.s
 
@@ -45,6 +46,7 @@ lc1: lc1.o
 		/usr/lib32/crti.o lc1.o -lc /usr/lib32/crtn.o
 
 lc.s: lc1
+	rm -f out.s
 	cat lc.c | ./lc1
 	mv out.s lc.s
 
