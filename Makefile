@@ -25,6 +25,7 @@ test: tests lc0
 	bash test.sh
 
 tests/%.test: tests/%.lc lc0
+	rm -f out.s
 	cat "$<" | ./lc0
 	as -g -s --32 -o "$@.o" out.s
 	ld -m elf_i386 -o "$@" -dynamic-linker /lib/ld-linux.so.2 /usr/lib32/crt1.o \
